@@ -1,0 +1,8 @@
+version: '2'
+
+services:
+  documentz-backend:
+    image: documentz-backend
+    build:
+      context: ./documentz-backend
+      dockerfile: Dockerfile
