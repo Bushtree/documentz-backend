@@ -3,7 +3,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>37460eea-4fa6-4b3c-aa41-1a3af9e1a7f3</ProjectGuid>
     <DockerLaunchBrowser>True</DockerLaunchBrowser>
-    <DockerServiceUrl>http://localhost:{ServicePort}/api/values</DockerServiceUrl>
+    <DockerServiceUrl>http://localhost:{ServicePort}/api/documents</DockerServiceUrl>
     <DockerServiceName>documentz-backend</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
