@@ -35,6 +35,7 @@ namespace documentz_backend
 
             // Add framework services.
             services.AddMvc();
+            services.Configure<MongoConfig>(Configuration.GetSection("Mongo"));
 
             services.AddSwaggerGen(c =>
             {

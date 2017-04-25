@@ -15,19 +15,19 @@ namespace documentz_backend.Data
         {
             new Document
             {
-                Id = 1,
+                Id = Guid.NewGuid(),
                 Name = "Doc 1",
                 Category = "invoice"
             },
             new Document
             {
-                Id = 2,
+                Id = Guid.NewGuid(),
                 Name = "Doc 2",
                 Category = "invoice"
             },
             new Document
             {
-                Id = 3,
+                Id = Guid.NewGuid(),
                 Name = "Doc 3",
                 Category = "general"
             }
@@ -46,19 +46,19 @@ namespace documentz_backend.Data
             return documents.AsEnumerable();
         }
 
-        public async Task<Document> GetDocumentAsync(int id)
+        public async Task<Document> GetDocumentAsync(Guid id)
         {
             return documents.SingleOrDefault(doc => doc.Id == id);
         }
 
-        public async Task<int> AddDocumentAsync(Document document)
+        public async Task<Guid> AddDocumentAsync(Document document)
         {
             lock (obj)
             {
-                document.Id = ++documentId;
+                document.Id = Guid.NewGuid();
             }
             documents.Add(document);
-            return documentId;
+            return document.Id;
         }
 
         public async Task UpdateDocumentAsync(Document document)
@@ -74,7 +74,7 @@ namespace documentz_backend.Data
             }
         }
 
-        public async Task DeleteDocumentAsync(int id)
+        public async Task DeleteDocumentAsync(Guid id)
         {
             var document = await GetDocumentAsync(id);
             if (document == null)
@@ -99,12 +99,12 @@ namespace documentz_backend.Data
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Tag>> GetAttachments(int documentId)
+        public Task<IEnumerable<Tag>> GetAttachments(Guid documentId)
         {
             throw new NotImplementedException();
         }
 
-        public Task AddAttachmentAsync(int documentId, Attachment attachment)
+        public Task AddAttachmentAsync(Guid documentId, Attachment attachment)
         {
             throw new NotImplementedException();
         }

@@ -2,49 +2,58 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using documentz_backend.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 
 namespace documentz_backend.Data
 {
     public class MongoDbContext : IDbContext
     {
-        private readonly MongoClient client;
+        const string DbName = "documents";
         private readonly IMongoDatabase db;
+        private readonly ILogger logger;
 
-        public MongoDbContext()
+        public MongoDbContext(IOptions<MongoConfig> config, ILogger<MongoDbContext> logger)
         {
-            client = new MongoClient("mongodb://documentz-mongo:27017");
-            db = client.GetDatabase("documents");
+            this.logger = logger;
+            logger.LogDebug(LoggingEvents.Initialize, "Initialized with config {0}", JsonConvert.SerializeObject(config.Value));
+            db = new MongoClient(config.Value.ConnectionString).GetDatabase(DbName);
         }
 
         public async Task<IEnumerable<Document>> GetDocumentsAsync()
         {
-            await EnsureCollection<Document>("Documents");
-            return await db.GetCollection<Document>("Documents").Find(new BsonDocument()).ToListAsync();
+            logger.LogDebug(LoggingEvents.ListItems, "Get Documents");
+            var collection = await GetDocumentsCollection();
+            return await collection.Find(new BsonDocument()).ToListAsync();
         }
 
-        public Task<Document> GetDocumentAsync(int id)
+        public async Task<Document> GetDocumentAsync(Guid id)
         {
-            throw new System.NotImplementedException();
+            logger.LogTrace(LoggingEvents.GetItem, $"Get document {id}");
+            var collection = await GetDocumentsCollection();
+            return await collection.Find(CreateIdFilter(id)).SingleOrDefaultAsync();
         }
 
-        public async Task<int> AddDocumentAsync(Document document)
+        public async Task<Guid> AddDocumentAsync(Document document)
         {
-            await EnsureCollection<Document>("Documents");
-            document.Id = new Random().Next();
-            await db.GetCollection<Document>("Documents").InsertOneAsync(document);
+            var collection = await GetDocumentsCollection();
+            await collection.InsertOneAsync(document);
             return document.Id;
         }
 
-        public Task UpdateDocumentAsync(Document document)
+        public async Task UpdateDocumentAsync(Document document)
         {
-            throw new System.NotImplementedException();
+            var collection = await GetDocumentsCollection();
+            await collection.FindOneAndReplaceAsync(CreateIdFilter(document.Id), document);
         }
 
-        public Task DeleteDocumentAsync(int id)
+        public async Task DeleteDocumentAsync(Guid id)
         {
-            throw new System.NotImplementedException();
+            var collection = await GetDocumentsCollection();
+            await collection.FindOneAndDeleteAsync(CreateIdFilter(id));
         }
 
         public Task<IEnumerable<string>> GetCategoriesAsync()
@@ -62,24 +71,37 @@ namespace documentz_backend.Data
             throw new System.NotImplementedException();
         }
 
-        public Task<IEnumerable<Models.Tag>> GetAttachments(int documentId)
+        public Task<IEnumerable<Models.Tag>> GetAttachments(Guid documentId)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task AddAttachmentAsync(int documentId, Attachment attachment)
+        public Task AddAttachmentAsync(Guid documentId, Attachment attachment)
         {
             throw new System.NotImplementedException();
+        }
+
+        private async Task<IMongoCollection<Document>> GetDocumentsCollection()
+        {
+            await EnsureCollection<Document>("documents");
+            return db.GetCollection<Document>("documents");
         }
 
         private async Task EnsureCollection<T>(string collectionName)
         {
-            var collections = db.ListCollections();
             var collection = db.GetCollection<T>(collectionName);
             if (collection == null)
             {
+                logger.LogDebug(LoggingEvents.Initialize, $"Collection {collectionName} does not exist.");
                 await db.CreateCollectionAsync(collectionName);
+                logger.LogDebug(LoggingEvents.Initialize, $"Created {collectionName}.");
             }
         }
+
+        private static FilterDefinition<Document> CreateIdFilter(Guid id)
+        {
+            return Builders<Document>.Filter.Eq("Id", id);
+        }
+
     }
 }

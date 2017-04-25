@@ -8,7 +8,7 @@ namespace documentz_backend.Models
 {
     public class Document
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         [Required]
         public string Category { get; set; }
         public List<Tag> Tags { get; set; }

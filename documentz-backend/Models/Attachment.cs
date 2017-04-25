@@ -9,6 +9,7 @@ namespace documentz_backend.Models
     public class Attachment
     {
         public string Name { get; set; }
+        [Key]
         [Required]
         public string Path { get; set; }
     }

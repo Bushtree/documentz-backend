@@ -8,6 +8,7 @@ namespace documentz_backend.Models
 {
     public class Tag
     {
+        [Key]
         [Required]
         public string Value { get; set; }
     }

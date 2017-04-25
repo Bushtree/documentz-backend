@@ -6,6 +6,7 @@ using documentz_backend.Data;
 using documentz_backend.Errors;
 using documentz_backend.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace documentz_backend.Controllers
 {
@@ -13,10 +14,12 @@ namespace documentz_backend.Controllers
     public class DocumentsController : Controller
     {
         private readonly IDbContext db;
+        private readonly ILogger logger;
 
-        public DocumentsController(IDbContext db)
+        public DocumentsController(IDbContext db, ILogger<DocumentsController> logger)
         {
             this.db = db;
+            this.logger = logger;
         }
         // GET api/values
         [HttpGet]
@@ -27,9 +30,15 @@ namespace documentz_backend.Controllers
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public async Task<Document> Get(int id)
+        public async Task<IActionResult> Get(Guid id)
         {
-            return await db.GetDocumentAsync(id);
+            var result = await db.GetDocumentAsync(id);
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            return Json(result);
         }
 
         // POST api/values
@@ -60,6 +69,7 @@ namespace documentz_backend.Controllers
             }
             catch (ItemNotFoundException ex)
             {
+                logger.LogError(LoggingEvents.ItemNotFound, ex, $"Document {document.Id} not found.");
                 return NotFound(document);
             }
 
@@ -68,7 +78,7 @@ namespace documentz_backend.Controllers
 
         // DELETE api/values/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(Guid id)
         {
             try
             {
@@ -76,6 +86,7 @@ namespace documentz_backend.Controllers
             }
             catch (ItemNotFoundException ex)
             {
+                logger.LogError(LoggingEvents.ItemNotFound, ex, $"Document {id} not found.");
                 return NotFound(id);
             }
 
