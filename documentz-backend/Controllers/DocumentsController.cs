@@ -25,7 +25,8 @@ namespace documentz_backend.Controllers
         [HttpGet]
         public async Task<IEnumerable<Document>> Get()
         {
-            return await db.GetDocumentsAsync();
+            var enumerable = await db.GetDocumentsAsync();
+            return enumerable;
         }
 
         // GET api/values/5

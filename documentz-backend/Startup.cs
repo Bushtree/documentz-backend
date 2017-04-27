@@ -31,7 +31,8 @@ namespace documentz_backend
         {
             // Setup DI
 //            services.AddSingleton<IDbContext, InMemoryDbContext>();
-             services.AddSingleton<IDbContext, MongoDbContext>();
+            services.AddSingleton<IDbContext, MongoDbContext>();
+            services.AddCors();
 
             // Add framework services.
             services.AddMvc();
@@ -52,6 +53,10 @@ namespace documentz_backend
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+            app.UseCors(builder =>
+            {
+                builder.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowCredentials();
+            });
 
             app.UseMvc();
             // Use swagger
