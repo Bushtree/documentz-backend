@@ -1,5 +1,5 @@
 ﻿using Documentz.Models;
-using Documentz.ViewModels;
+using Documentz.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +13,7 @@ namespace Documentz.Utils
         {
             AutoMapper.Mapper.Initialize(config =>
             {
-                config.CreateMap<StoredItem, StoredItemViewModel>().ReverseMap();
+                config.CreateMap<StoredItem, StoredItemDTO>().ReverseMap();
             });
         }
 
