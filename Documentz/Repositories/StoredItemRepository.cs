@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Documentz.Models
+namespace Documentz.Repositories
 {
-    public class StoredItem : IStoredItem
+    public class StoredItemRepository
     {
-        public string Name { get; set; }
     }
 }
