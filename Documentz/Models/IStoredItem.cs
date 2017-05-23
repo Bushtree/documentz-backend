@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Documentz.Models
 {
-    interface IStoredItem
+    public interface IStoredItem
     {
         string Name { get; }
     }

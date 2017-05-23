@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Documentz.Repositories;
+using Documentz.Models;
 
 namespace Documentz.Controllers
 {
@@ -11,9 +13,10 @@ namespace Documentz.Controllers
     {
         // GET api/values
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<IEnumerable<IStoredItem>> Get()
         {
-            return new string[] { "value1", "value2" };
+            DocumentDbRepository<StoredItem>.Initialize();
+            return await DocumentDbRepository<StoredItem>.GetItemsAsync(a => true);
         }
 
         // GET api/values/5
