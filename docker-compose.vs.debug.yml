@@ -1,15 +1,15 @@
 version: '2'
 
 services:
-  documentz-backend:
-    image: documentz-backend:dev
+  documentz:
+    image: documentz:dev
     build:
       args:
         source: ${DOCKER_BUILD_SOURCE}
     environment:
       - DOTNET_USE_POLLING_FILE_WATCHER=1
     volumes:
-      - ./documentz-backend:/app
+      - ./../Documentz:/app
       - ~/.nuget/packages:/root/.nuget/packages:ro
       - ~/clrdbg:/clrdbg:ro
     entrypoint: tail -f /dev/null
