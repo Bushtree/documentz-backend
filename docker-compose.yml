@@ -4,5 +4,5 @@ services:
   documentz:
     image: documentz
     build:
-      context: ./../Documentz
+      context: ./Documentz
       dockerfile: Dockerfile
