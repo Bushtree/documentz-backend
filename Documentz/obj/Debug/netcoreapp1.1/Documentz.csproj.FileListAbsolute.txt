@@ -1,6 +1,0 @@
-C:\Users\Arek\Source\Repos\Documentz\bin\Debug\netcoreapp1.1\Documentz.deps.json
-C:\Users\Arek\Source\Repos\Documentz\bin\Debug\netcoreapp1.1\Documentz.runtimeconfig.json
-C:\Users\Arek\Source\Repos\Documentz\bin\Debug\netcoreapp1.1\Documentz.runtimeconfig.dev.json
-C:\Users\Arek\Source\Repos\Documentz\bin\Debug\netcoreapp1.1\Documentz.dll
-C:\Users\Arek\Source\Repos\Documentz\obj\Debug\netcoreapp1.1\Documentz.csprojResolveAssemblyReference.cache
-C:\Users\Arek\Source\Repos\Documentz\obj\Debug\netcoreapp1.1\Documentz.AssemblyInfo.cs
