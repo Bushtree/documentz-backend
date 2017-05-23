@@ -9,6 +9,6 @@ namespace Documentz.Services
 {
     public interface IStoredItemService
     {
-        Task<IEnumerable<StoredItemDTO>> GetItemsAsync(Expression<Func<StoredItem, bool>> predicate = null);
+        Task<IEnumerable<StoredItemDTO>> GetAllItemsAsync();
     }
 }

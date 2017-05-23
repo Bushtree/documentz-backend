@@ -12,9 +12,9 @@ namespace Documentz.Services
 {
     public class StoredItemService : IStoredItemService
     {
-        public async Task<IEnumerable<StoredItemDTO>> GetItemsAsync(Expression<Func<StoredItem, bool>> predicate = null)
+        public async Task<IEnumerable<StoredItemDTO>> GetAllItemsAsync()
         {
-            return Mapper.Map<IEnumerable<StoredItemDTO>>(await DocumentDbRepository<StoredItem>.GetItemsAsync(predicate));
+            return Mapper.Map<IEnumerable<StoredItemDTO>>(await DocumentDbRepository<StoredItem>.GetItemsAsync(a => true));
         }
     }
 }
