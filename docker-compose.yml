@@ -1,12 +1,8 @@
 version: '2'
 
 services:
-  documentz-mongo:
-    image: mongo
-    ports: 
-      - "27017:27017"
-  documentz-backend:
-    image: documentz-backend
+  documentz:
+    image: documentz
     build:
-      context: ./documentz-backend
+      context: ./Documentz
       dockerfile: Dockerfile

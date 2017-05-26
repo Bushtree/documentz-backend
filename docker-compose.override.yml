@@ -1,7 +1,7 @@
 version: '2'
 
 services:
-  documentz-backend:
+  documentz:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     ports:

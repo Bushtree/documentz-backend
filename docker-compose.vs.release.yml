@@ -1,7 +1,7 @@
 version: '2'
 
 services:
-  documentz-backend:
+  documentz:
     build:
       args:
         source: ${DOCKER_BUILD_SOURCE}

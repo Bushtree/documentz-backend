@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using documentz_backend.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Swagger;
+using Documentz.Repositories;
+using Documentz.Models;
+using Documentz.Services;
 
-namespace documentz_backend
+namespace Documentz
 {
     public class Startup
     {
@@ -22,6 +25,7 @@ namespace documentz_backend
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
+
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -29,23 +33,18 @@ namespace documentz_backend
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Setup DI
-//            services.AddSingleton<IDbContext, InMemoryDbContext>();
-            services.AddSingleton<IDbContext, MongoDbContext>();
-            services.AddCors();
-
             // Add framework services.
-            services.AddMvc();
-            services.Configure<MongoConfig>(Configuration.GetSection("Mongo"));
-
+            services.AddMvc().AddJsonOptions(opt =>
+            {
+                opt.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            });
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info
-                {
-                    Title = "Documentz Api",
-                    Version = "1.0"
-                });
+                c.SwaggerDoc("v1", new Info { Title = "Documentz API", Version = "v1" });
             });
+            services.AddSingleton<IStoredItemService, StoredItemService>();
+            DocumentDbRepository<IStoredItem>.Initialize();
+            Utils.AutoMappingConfigurator.Configure();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,17 +52,15 @@ namespace documentz_backend
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-            app.UseCors(builder =>
-            {
-                builder.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowCredentials();
-            });
 
             app.UseMvc();
-            // Use swagger
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS etc.), specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Documentz Api");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Documentz API V1");
             });
         }
     }
