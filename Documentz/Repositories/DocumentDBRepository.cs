@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
+using System.IO;
 
 namespace Documentz.Repositories
 {
@@ -60,25 +61,19 @@ namespace Documentz.Repositories
             return await client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId), item);
         }
 
-        public static async Task<Attachment> AddAttachment(string id)
+        public static async Task<Attachment> AddAttachment(string id, Stream file)
         {
-            var stream = System.IO.File.OpenRead(@"C:\Users\WueF\Pictures\IMG_3887.png");
             Document document = await client.ReadDocumentAsync(UriFactory.CreateDocumentUri(DatabaseId, CollectionId, id));
-            return await client.CreateAttachmentAsync(document.AttachmentsLink, stream);
+            return await client.CreateAttachmentAsync(document.AttachmentsLink, file);
         }
 
-        public static async Task<string> GetAttachment(string id)
+        public static async Task<Stream> GetAttachment(string id)
         {
             Document document = await client.ReadDocumentAsync(UriFactory.CreateDocumentUri(DatabaseId, CollectionId, id));
             var attachments = await client.ReadAttachmentFeedAsync(document.AttachmentsLink);
 
             var media = await client.ReadMediaAsync(attachments.First()?.MediaLink);
-
-            System.IO.StreamReader reader = new System.IO.StreamReader(media.Media);
-
-            var res = await reader.ReadToEndAsync();
-
-            return res;
+            return media.Media;
         }
 
         public static async Task<Document> UpdateItemAsync(string id, T item)

@@ -26,7 +26,7 @@ namespace Documentz.Controllers
         [ActionName("Get")]
         public async Task<IEnumerable<IStoredItem>> GetAsync()
         {
-            if 
+             
 
             return await StoredItemService.GetAllItemsAsync();
         }
