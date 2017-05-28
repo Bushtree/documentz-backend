@@ -11,7 +11,7 @@ using Documentz.Services;
 namespace Documentz.Controllers
 {
     [Produces("application/json")]
-    [Route("api/stored-item")]
+    [Route("api/[controller]")]
     public class StoredItemController : Controller
     {
         private IStoredItemService StoredItemService { get; }
@@ -26,34 +26,47 @@ namespace Documentz.Controllers
         [ActionName("Get")]
         public async Task<IEnumerable<IStoredItem>> GetAsync()
         {
-             
-
             return await StoredItemService.GetAllItemsAsync();
         }
 
         // GET: api/StoredItem/5
         [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
+        public async Task<IActionResult> GetAsync(string id)
         {
-            return "value";
+            IStoredItem storedItem = await StoredItemService.GetItemAsync(id);
+
+            if (storedItem == null)
+            {
+                return NotFound();
+            }
+            return Ok(storedItem);
         }
         
         // POST: api/StoredItem
-        [HttpPost]
-        public void Post([FromBody]string value)
+        [HttpPost(Name = "Post")]
+        public async Task<IActionResult> PostAsync([FromBody]StoredItem item)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            var createdItem = await StoredItemService.AddItemAsync(item);
+            return Created($"/api/storeditem/{createdItem.Id}", createdItem);
         }
         
         // PUT: api/StoredItem/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        [HttpPut("{id}", Name = "Put")]
+        public async Task<IActionResult> PutAsync(string id, [FromBody]IStoredItem value)
         {
+            await StoredItemService.UpdateItemAsync(id, value);
+            return Ok();
         }
         
         // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete("{id}", Name = "Delete")]
+        public async void DeleteAsync(string id)
         {
+            await StoredItemService.DeleteItemAsync(id);
         }
     }
 }
