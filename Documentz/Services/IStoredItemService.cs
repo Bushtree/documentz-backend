@@ -9,6 +9,10 @@ namespace Documentz.Services
 {
     public interface IStoredItemService
     {
-        Task<IEnumerable<StoredItemDTO>> GetAllItemsAsync();
+        Task<IStoredItem> AddItemAsync(IStoredItem item);
+        Task DeleteItemAsync(string id);
+        Task<IStoredItem> GetItemAsync(string id);
+        Task<IEnumerable<IStoredItem>> GetAllItemsAsync();
+        Task UpdateItemAsync(string id, IStoredItem item);
     }
 }
