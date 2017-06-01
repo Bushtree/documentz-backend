@@ -12,29 +12,32 @@ namespace Documentz.Services
 {
     public class StoredItemService : IStoredItemService
     {
+        private readonly IDbService dbService;
+        public StoredItemService(IDbService _dbService) => (dbService) = (_dbService);
+
         public async Task<IStoredItem> AddItemAsync(IStoredItem item)
         {
-            return Mapper.Map<StoredItemDTO>(await DocumentDbRepository<StoredItem>.CreateItemAsync(Mapper.Map<StoredItem>(item)));
+            return Mapper.Map<StoredItemDTO>(await dbService.CreateStoredItemAsync(item));
         }
 
         public async Task DeleteItemAsync(string id)
         {
-            await DocumentDbRepository<StoredItem>.DeleteItemAsync(id);
+            await dbService.DeleteStoredItemAsync(id);
         }
 
         public async Task<IEnumerable<IStoredItem>> GetAllItemsAsync()
         {
-            return Mapper.Map<IEnumerable<StoredItemDTO>>(await DocumentDbRepository<StoredItem>.GetItemsAsync(a => true));
+            return Mapper.Map<IEnumerable<StoredItemDTO>>(await dbService.GetStoredItemsAsync());
         }
 
         public async Task<IStoredItem> GetItemAsync(string id)
         {
-            return Mapper.Map<StoredItemDTO>(await DocumentDbRepository<StoredItem>.GetItemAsync(id));
+            return Mapper.Map<StoredItemDTO>(await dbService.GetStoredItemAsync(id));
         }
 
-        public async Task UpdateItemAsync(string id, IStoredItem item)
+        public async Task<IStoredItem> UpdateItemAsync(string id, IStoredItem item)
         {
-            await DocumentDbRepository<StoredItem>.UpdateItemAsync(id, Mapper.Map<StoredItem>(item));
+            return Mapper.Map<StoredItemDTO>(await dbService.UpdateStoredItemAsync(id, Mapper.Map<StoredItem>(item)));
         }
     }
 }

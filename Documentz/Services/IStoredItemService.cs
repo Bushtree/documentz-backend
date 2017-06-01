@@ -13,6 +13,6 @@ namespace Documentz.Services
         Task DeleteItemAsync(string id);
         Task<IStoredItem> GetItemAsync(string id);
         Task<IEnumerable<IStoredItem>> GetAllItemsAsync();
-        Task UpdateItemAsync(string id, IStoredItem item);
+        Task<IStoredItem> UpdateItemAsync(string id, IStoredItem item);
     }
 }

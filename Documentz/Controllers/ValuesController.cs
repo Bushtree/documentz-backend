@@ -13,10 +13,9 @@ namespace Documentz.Controllers
     {
         // GET api/values
         [HttpGet]
-        public async Task<IEnumerable<IStoredItem>> Get()
+        public string Get()
         {
-            DocumentDbRepository<StoredItem>.Initialize();
-            return await DocumentDbRepository<StoredItem>.GetItemsAsync(a => true);
+            return "some values";
         }
 
         // GET api/values/5

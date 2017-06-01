@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -12,6 +13,8 @@ using Swashbuckle.AspNetCore.Swagger;
 using Documentz.Repositories;
 using Documentz.Models;
 using Documentz.Services;
+using Documentz.Utils;
+using Newtonsoft.Json;
 
 namespace Documentz
 {
@@ -22,10 +25,11 @@ namespace Documentz
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables();
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
+            Debug.WriteLine("Write");
+            Debug.WriteLine(env.EnvironmentName);
             Configuration = builder.Build();
-
+            Debug.WriteLine(JsonConvert.SerializeObject(Configuration));
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -43,9 +47,13 @@ namespace Documentz
             {
                 c.SwaggerDoc("v1", new Info { Title = "Documentz API", Version = "v1" });
             });
+
+            services.Configure<CosmosConfig>(Configuration.GetSection("CosmosConfig"));
+            var cfg = Configuration.GetSection("CosmosConfig").Get<CosmosConfig>();
+            Debug.WriteLine($"Config: {JsonConvert.SerializeObject(Configuration.GetSection("CosmosConfig").Get<CosmosConfig>())} End Config");
+            services.AddSingleton<IDbService, CosmosDbService>();
             services.AddSingleton<IStoredItemService, StoredItemService>();
-            DocumentDbRepository<IStoredItem>.Initialize();
-            Utils.AutoMappingConfigurator.Configure();
+            AutoMappingConfigurator.Configure();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

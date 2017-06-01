@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Documentz.Repositories;
 using Documentz.Models;
 using Documentz.Services;
+using Documentz.Utils;
+using Microsoft.Extensions.Options;
 
 namespace Documentz.Controllers
 {
@@ -16,7 +18,7 @@ namespace Documentz.Controllers
     {
         private IStoredItemService StoredItemService { get; }
 
-        public StoredItemController(IStoredItemService storedItemService)
+        public StoredItemController(IStoredItemService storedItemService, IOptionsSnapshot<CosmosConfig> cfg)
         {
             StoredItemService = storedItemService;
         }
