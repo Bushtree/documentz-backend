@@ -26,10 +26,7 @@ namespace Documentz
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
-            Debug.WriteLine("Write");
-            Debug.WriteLine(env.EnvironmentName);
             Configuration = builder.Build();
-            Debug.WriteLine(JsonConvert.SerializeObject(Configuration));
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -49,8 +46,6 @@ namespace Documentz
             });
 
             services.Configure<CosmosConfig>(Configuration.GetSection("CosmosConfig"));
-            var cfg = Configuration.GetSection("CosmosConfig").Get<CosmosConfig>();
-            Debug.WriteLine($"Config: {JsonConvert.SerializeObject(Configuration.GetSection("CosmosConfig").Get<CosmosConfig>())} End Config");
             services.AddSingleton<IDbService, CosmosDbService>();
             services.AddSingleton<IStoredItemService, StoredItemService>();
             AutoMappingConfigurator.Configure();

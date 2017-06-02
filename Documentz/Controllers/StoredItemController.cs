@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,10 +18,7 @@ namespace Documentz.Controllers
     {
         private IStoredItemService StoredItemService { get; }
 
-        public StoredItemController(IStoredItemService storedItemService, IOptionsSnapshot<CosmosConfig> cfg)
-        {
-            StoredItemService = storedItemService;
-        }
+        public StoredItemController(IStoredItemService storedItemService) => StoredItemService = storedItemService;
 
         // GET: api/StoredItem
         [HttpGet]
@@ -43,7 +40,7 @@ namespace Documentz.Controllers
             }
             return Ok(storedItem);
         }
-        
+
         // POST: api/StoredItem
         [HttpPost(Name = "Post")]
         public async Task<IActionResult> PostAsync([FromBody]StoredItem item)
@@ -55,7 +52,7 @@ namespace Documentz.Controllers
             var createdItem = await StoredItemService.AddItemAsync(item);
             return Created($"/api/storeditem/{createdItem.Id}", createdItem);
         }
-        
+
         // PUT: api/StoredItem/5
         [HttpPut("{id}", Name = "Put")]
         public async Task<IActionResult> PutAsync(string id, [FromBody]IStoredItem value)
@@ -63,7 +60,7 @@ namespace Documentz.Controllers
             await StoredItemService.UpdateItemAsync(id, value);
             return Ok();
         }
-        
+
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}", Name = "Delete")]
         public async void DeleteAsync(string id)

@@ -31,7 +31,7 @@ namespace Documentz.Services
         public async Task<IStoredItem> CreateStoredItemAsync(IStoredItem item)
         {
             await EnsureInitializedAsync();
-            return Mapper.Map<StoredItem>(await client.CreateDocumentAsync(CreateDocumentCollectionUri(), item));
+            return (StoredItem)(dynamic)await client.CreateDocumentAsync(CreateDocumentCollectionUri(), item);
         }
 
         public async Task DeleteStoredItemAsync(string id)
@@ -40,10 +40,10 @@ namespace Documentz.Services
             await client.DeleteDocumentAsync(CreateDocumentUri(id));
         }
 
-        public async Task<IEnumerable<IStoredItem>> GetStoredItemsAsync(Expression<Func<IStoredItem, bool>> predicate = null)
+        public async Task<IEnumerable<IStoredItem>> GetStoredItemsAsync(Expression<Func<IStoredItem, bool>> predicate)
         {
             await EnsureInitializedAsync();
-            return await GetItemsAsync(predicate);
+            return (await GetItemsAsync(predicate ?? (a => true))).Cast<StoredItem>();
         }
 
         public async Task<IStoredItem> GetStoredItemAsync(string id)
@@ -67,7 +67,7 @@ namespace Documentz.Services
             }
             catch (DocumentClientException e)
             {
-                if (e.StatusCode == System.Net.HttpStatusCode.NotFound)
+                if (e.StatusCode == HttpStatusCode.NotFound)
                 {
                     return null;
                 }
