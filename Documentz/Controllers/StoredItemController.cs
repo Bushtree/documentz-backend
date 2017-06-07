@@ -1,15 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Documentz.DTOs;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Documentz.Repositories;
 using Documentz.Models;
 using Documentz.Services;
-using Documentz.Utils;
-using Microsoft.Extensions.Options;
 
 namespace Documentz.Controllers
 {
@@ -19,10 +13,7 @@ namespace Documentz.Controllers
     {
         private IStoredItemService StoredItemService { get; }
 
-        public StoredItemController(IStoredItemService storedItemService)
-        {
-            StoredItemService = storedItemService;
-        }
+        public StoredItemController(IStoredItemService storedItemService) => StoredItemService = storedItemService;
 
         // GET: api/StoredItem
         [HttpGet]
@@ -44,7 +35,7 @@ namespace Documentz.Controllers
             }
             return Ok(storedItem);
         }
-        
+
         // POST: api/StoredItem
         [HttpPost(Name = "Post")]
         public async Task<IActionResult> PostAsync([FromBody]StoredItemDTO item)
@@ -56,7 +47,7 @@ namespace Documentz.Controllers
             var createdItem = await StoredItemService.AddItemAsync(item);
             return Created($"/api/storeditem/{createdItem.Id}", createdItem);
         }
-        
+
         // PUT: api/StoredItem/5
         [HttpPut("{id}", Name = "Put")]
         public async Task<IActionResult> PutAsync(string id, [FromBody]StoredItemDTO value)
@@ -64,7 +55,7 @@ namespace Documentz.Controllers
             await StoredItemService.UpdateItemAsync(id, value);
             return Ok();
         }
-        
+
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}", Name = "Delete")]
         public async void DeleteAsync(string id)

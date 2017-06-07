@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
@@ -61,6 +62,15 @@ namespace Documentz.Services
             return (StoredItem)(dynamic)response.Resource;
         }
 
+        public async Task<IEnumerable<dynamic>> GetAttachmentsAsync(string id)
+        {
+            await EnsureInitializedAsync();
+            Document document = await client.ReadDocumentAsync(CreateDocumentUri(id));
+            var result = await client.ReadAttachmentFeedAsync(document.AttachmentsLink);
+            var list = result.ToList();
+            return result.AsEnumerable();
+        }
+        
         private async Task<T> GetItemAsync<T>(string id) where T : class
         {
             try
@@ -70,7 +80,7 @@ namespace Documentz.Services
             }
             catch (DocumentClientException e)
             {
-                if (e.StatusCode == System.Net.HttpStatusCode.NotFound)
+                if (e.StatusCode == HttpStatusCode.NotFound)
                 {
                     return null;
                 }
@@ -88,7 +98,7 @@ namespace Documentz.Services
                     new FeedOptions { MaxItemCount = -1 })
                 .Where(predicate)
                 .AsDocumentQuery();
-
+            
             List<T> results = new List<T>();
             while (query.HasMoreResults)
             {
@@ -158,5 +168,9 @@ namespace Documentz.Services
             }
         } 
         #endregion
+    }
+
+    public interface IAttachment
+    {
     }
 }

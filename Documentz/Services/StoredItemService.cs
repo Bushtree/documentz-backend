@@ -4,6 +4,7 @@ using Documentz.Models;
 using Documentz.Repositories;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -38,6 +39,22 @@ namespace Documentz.Services
         public async Task<IStoredItem> UpdateItemAsync(string id, IStoredItem item)
         {
             return Mapper.Map<StoredItemDTO>(await dbService.UpdateStoredItemAsync(id, Mapper.Map<StoredItem>(item)));
+        }
+
+        public async Task<IEnumerable<dynamic>> GetAttachmentsAsync(string id)
+        {
+//            throw new NotImplementedException();
+            return await dbService.GetAttachmentsAsync(id);
+        }
+
+        public Task AddAttachmentAsync(string id, Stream content)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteAttachmentAsync(string id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

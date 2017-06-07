@@ -14,6 +14,7 @@ using Documentz.Repositories;
 using Documentz.Models;
 using Documentz.Services;
 using Documentz.Utils;
+using Microsoft.AspNetCore.Http.Features;
 using Newtonsoft.Json;
 
 namespace Documentz
@@ -35,6 +36,7 @@ namespace Documentz
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRouting(options => options.LowercaseUrls = true);
+            services.AddCors();
             // Add framework services.
             services.AddMvc().AddJsonOptions(opt =>
             {
@@ -46,6 +48,7 @@ namespace Documentz
             });
 
             services.Configure<CosmosConfig>(Configuration.GetSection("CosmosConfig"));
+            services.Configure<FormOptions>(opt => opt.MemoryBufferThreshold = Int32.MaxValue);
             services.AddSingleton<IDbService, CosmosDbService>();
             services.AddSingleton<IStoredItemService, StoredItemService>();
             AutoMappingConfigurator.Configure();
@@ -57,6 +60,11 @@ namespace Documentz
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
+            if (env.IsDevelopment())
+            {
+                app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+                app.UseDeveloperExceptionPage();
+            }
             app.UseMvc();
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
