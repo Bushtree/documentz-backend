@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Documentz.DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Documentz.Repositories;
@@ -18,7 +19,7 @@ namespace Documentz.Controllers
     {
         private IStoredItemService StoredItemService { get; }
 
-        public StoredItemController(IStoredItemService storedItemService, IOptionsSnapshot<CosmosConfig> cfg)
+        public StoredItemController(IStoredItemService storedItemService)
         {
             StoredItemService = storedItemService;
         }
@@ -46,7 +47,7 @@ namespace Documentz.Controllers
         
         // POST: api/StoredItem
         [HttpPost(Name = "Post")]
-        public async Task<IActionResult> PostAsync([FromBody]StoredItem item)
+        public async Task<IActionResult> PostAsync([FromBody]StoredItemDTO item)
         {
             if (!ModelState.IsValid)
             {
@@ -58,7 +59,7 @@ namespace Documentz.Controllers
         
         // PUT: api/StoredItem/5
         [HttpPut("{id}", Name = "Put")]
-        public async Task<IActionResult> PutAsync(string id, [FromBody]IStoredItem value)
+        public async Task<IActionResult> PutAsync(string id, [FromBody]StoredItemDTO value)
         {
             await StoredItemService.UpdateItemAsync(id, value);
             return Ok();

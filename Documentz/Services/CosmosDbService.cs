@@ -12,6 +12,7 @@ using Documentz.Utils;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Options;
 
 namespace Documentz.Services
@@ -31,7 +32,8 @@ namespace Documentz.Services
         public async Task<IStoredItem> CreateStoredItemAsync(IStoredItem item)
         {
             await EnsureInitializedAsync();
-            return Mapper.Map<StoredItem>(await client.CreateDocumentAsync(CreateDocumentCollectionUri(), item));
+            var response = await client.CreateDocumentAsync(CreateDocumentCollectionUri(), item);
+            return (StoredItem)(dynamic)response.Resource;
         }
 
         public async Task DeleteStoredItemAsync(string id)
@@ -40,10 +42,10 @@ namespace Documentz.Services
             await client.DeleteDocumentAsync(CreateDocumentUri(id));
         }
 
-        public async Task<IEnumerable<IStoredItem>> GetStoredItemsAsync(Expression<Func<IStoredItem, bool>> predicate = null)
+        public async Task<IEnumerable<IStoredItem>> GetStoredItemsAsync()
         {
             await EnsureInitializedAsync();
-            return await GetItemsAsync(predicate);
+            return await GetItemsAsync<StoredItem>(a => true);
         }
 
         public async Task<IStoredItem> GetStoredItemAsync(string id)
@@ -55,7 +57,8 @@ namespace Documentz.Services
         public async Task<IStoredItem> UpdateStoredItemAsync(string id, IStoredItem item)
         {
             await EnsureInitializedAsync();
-            return Mapper.Map<StoredItem>(await client.ReplaceDocumentAsync(CreateDocumentUri(id), item));
+            var response = await client.ReplaceDocumentAsync(CreateDocumentUri(id), item);
+            return (StoredItem)(dynamic)response.Resource;
         }
 
         private async Task<T> GetItemAsync<T>(string id) where T : class

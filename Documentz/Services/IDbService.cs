@@ -11,7 +11,7 @@ namespace Documentz.Services
         Task<IStoredItem> CreateStoredItemAsync(IStoredItem item);
         Task DeleteStoredItemAsync(string id);
         Task<IStoredItem> GetStoredItemAsync(string id);
-        Task<IEnumerable<IStoredItem>> GetStoredItemsAsync(Expression<Func<IStoredItem, bool>> predicate = null);
+        Task<IEnumerable<IStoredItem>> GetStoredItemsAsync();
         Task<IStoredItem> UpdateStoredItemAsync(string id, IStoredItem item);
     }
 }
