@@ -15,5 +15,6 @@ namespace Documentz.Services
         Task<IEnumerable<IStoredItem>> GetStoredItemsAsync();
         Task<IStoredItem> UpdateStoredItemAsync(string id, IStoredItem item);
         Task<IEnumerable<dynamic>> GetAttachmentsAsync(string id);
+        Task CreateAttachmentAsync(string id, Stream content);
     }
 }

@@ -8,6 +8,8 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
 
 namespace Documentz.Services
 {
@@ -47,9 +49,9 @@ namespace Documentz.Services
             return await dbService.GetAttachmentsAsync(id);
         }
 
-        public Task AddAttachmentAsync(string id, Stream content)
+        public async Task AddAttachmentAsync(string id, Stream content)
         {
-            throw new NotImplementedException();
+            await dbService.CreateAttachmentAsync(id, content);
         }
 
         public Task DeleteAttachmentAsync(string id)

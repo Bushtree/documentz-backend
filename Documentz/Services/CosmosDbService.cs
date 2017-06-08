@@ -14,6 +14,7 @@ using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Documentz.Services
@@ -22,11 +23,13 @@ namespace Documentz.Services
     {
         private DocumentClient client;
         private readonly IOptionsSnapshot<CosmosConfig> configSnapshot;
+        private readonly ILogger<CosmosDbService> logger;
 
         private CosmosConfig Config => configSnapshot.Value;
 
-        public CosmosDbService(IOptionsSnapshot<CosmosConfig> config)
+        public CosmosDbService(IOptionsSnapshot<CosmosConfig> config, ILogger<CosmosDbService> _logger)
         {
+            logger = _logger;
             configSnapshot = config;
         }
 
@@ -34,7 +37,7 @@ namespace Documentz.Services
         {
             await EnsureInitializedAsync();
             var response = await client.CreateDocumentAsync(CreateDocumentCollectionUri(), item);
-            return (StoredItem)(dynamic)response.Resource;
+            return (StoredItem) (dynamic) response.Resource;
         }
 
         public async Task DeleteStoredItemAsync(string id)
@@ -59,7 +62,7 @@ namespace Documentz.Services
         {
             await EnsureInitializedAsync();
             var response = await client.ReplaceDocumentAsync(CreateDocumentUri(id), item);
-            return (StoredItem)(dynamic)response.Resource;
+            return (StoredItem) (dynamic) response.Resource;
         }
 
         public async Task<IEnumerable<dynamic>> GetAttachmentsAsync(string id)
@@ -70,13 +73,28 @@ namespace Documentz.Services
             var list = result.ToList();
             return result.AsEnumerable();
         }
-        
+
+        public async Task CreateAttachmentAsync(string id, Stream content)
+        {
+            await EnsureInitializedAsync();
+            Document document = await client.ReadDocumentAsync(CreateDocumentUri(id));
+            try
+            {
+                ResourceResponse<Attachment> response = await client.CreateAttachmentAsync(document.AttachmentsLink, content);
+            }
+            catch (Exception e)
+            {
+                logger.LogError("Error adding attachment");
+            }
+            logger.LogDebug("Created attachment");
+        }
+
         private async Task<T> GetItemAsync<T>(string id) where T : class
         {
             try
             {
                 Document document = await client.ReadDocumentAsync(CreateDocumentUri(id));
-                return (T)(dynamic)document;
+                return (T) (dynamic) document;
             }
             catch (DocumentClientException e)
             {
@@ -91,14 +109,14 @@ namespace Documentz.Services
             }
         }
 
-        public async Task<IEnumerable<T>> GetItemsAsync<T>(Expression<Func<T, bool>> predicate) where T: class
+        public async Task<IEnumerable<T>> GetItemsAsync<T>(Expression<Func<T, bool>> predicate) where T : class
         {
             IDocumentQuery<T> query = client.CreateDocumentQuery<T>(
                     CreateDocumentCollectionUri(),
-                    new FeedOptions { MaxItemCount = -1 })
+                    new FeedOptions {MaxItemCount = -1})
                 .Where(predicate)
                 .AsDocumentQuery();
-            
+
             List<T> results = new List<T>();
             while (query.HasMoreResults)
             {
@@ -122,7 +140,8 @@ namespace Documentz.Services
 
         private async Task EnsureInitializedAsync()
         {
-            client = new DocumentClient(new Uri(Config.Endpoint), Config.Key, new ConnectionPolicy { EnableEndpointDiscovery = false });
+            client = new DocumentClient(new Uri(Config.Endpoint), Config.Key,
+                new ConnectionPolicy {EnableEndpointDiscovery = false});
             await CreateDatabaseIfNotExistsAsync();
             await CreateCollectionIfNotExistsAsync();
         }
@@ -137,7 +156,7 @@ namespace Documentz.Services
             {
                 if (e.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
-                    await client.CreateDatabaseAsync(new Database { Id = Config.DatabaseId });
+                    await client.CreateDatabaseAsync(new Database {Id = Config.DatabaseId});
                 }
                 else
                 {
@@ -150,7 +169,8 @@ namespace Documentz.Services
         {
             try
             {
-                await client.ReadDocumentCollectionAsync(UriFactory.CreateDocumentCollectionUri(Config.DatabaseId, Config.CollectionId));
+                await client.ReadDocumentCollectionAsync(
+                    UriFactory.CreateDocumentCollectionUri(Config.DatabaseId, Config.CollectionId));
             }
             catch (DocumentClientException e)
             {
@@ -158,15 +178,16 @@ namespace Documentz.Services
                 {
                     await client.CreateDocumentCollectionAsync(
                         UriFactory.CreateDatabaseUri(Config.DatabaseId),
-                        new DocumentCollection { Id = Config.CollectionId },
-                        new RequestOptions { OfferThroughput = 1000 });
+                        new DocumentCollection {Id = Config.CollectionId},
+                        new RequestOptions {OfferThroughput = 1000});
                 }
                 else
                 {
                     throw;
                 }
             }
-        } 
+        }
+
         #endregion
     }
 

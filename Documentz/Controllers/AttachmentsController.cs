@@ -50,7 +50,8 @@ namespace Documentz.Controllers
             {
                 var memory = new MemoryStream();
                 await file.CopyToAsync(memory);
-                await DocumentDbRepository<StoredItem>.AddAttachment(documentId, memory);
+//                await DocumentDbRepository<StoredItem>.AddAttachment(documentId, memory);
+                await storedItemService.AddAttachmentAsync(documentId, memory);
             }
             return Ok();
         }
