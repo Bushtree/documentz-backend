@@ -18,7 +18,7 @@ namespace Documentz.Controllers
         public AttachmentsController(IStoredItemService service) => storedItemService = service;
 
         // GET: api/values
-        [HttpGet("{id}")]
+        [HttpGet]
         public async Task<IEnumerable<dynamic>> GetAsync(string id)
         {
             return await storedItemService.GetAttachmentsAsync(id);
@@ -37,19 +37,18 @@ namespace Documentz.Controllers
 
         // POST api/values
         [HttpPost]
-        public async Task<IActionResult> PostAsync([FromForm]string documentId, [FromForm] IEnumerable<IFormFile> files)
+        public async Task<IActionResult> PostAsync([FromForm] string documentId, [FromForm] IEnumerable<IFormFile> files)
         {
             var list = files.ToList();
             if (!list.Any())
             {
                 return BadRequest("Empty file list");
             }
-            var path = Path.GetTempFileName();
-
             foreach(var file in list)
             {
                 var memory = new MemoryStream();
                 await file.CopyToAsync(memory);
+                memory.Seek(0, SeekOrigin.Begin);
 //                await DocumentDbRepository<StoredItem>.AddAttachment(documentId, memory);
                 await storedItemService.AddAttachmentAsync(documentId, memory);
             }
