@@ -7,42 +7,52 @@ using Microsoft.AspNetCore.Http;
 using System.IO;
 using Documentz.Repositories;
 using Documentz.Models;
+using Documentz.Services;
 
 namespace Documentz.Controllers
 {
     [Route("api/[controller]")]
     public class AttachmentsController : Controller
     {
+        private readonly IStoredItemService storedItemService;
+        public AttachmentsController(IStoredItemService service) => storedItemService = service;
+
         // GET: api/values
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<IEnumerable<dynamic>> GetAsync(string id)
         {
-            return new string[] { "value1", "value2" };
+            return await storedItemService.GetAttachmentsAsync(id);
         }
 
         // GET api/values/5
-        [HttpGet("{id}")]
-        public async Task<JsonResult> Get(string id)
-        {
-            var res = await DocumentDbRepository<StoredItem>.GetAttachment(id);
-            var memory = new MemoryStream();
-            await res.CopyToAsync(memory);
-            var reader = new StreamReader(memory);
-            return Json(await reader.ReadToEndAsync());
-        }
+//        [HttpGet("{id}")]
+//        public async Task<JsonResult> Get(string id)
+//        {
+//            var res = await DocumentDbRepository<StoredItem>.GetAttachment(id);
+//            var memory = new MemoryStream();
+//            await res.CopyToAsync(memory);
+//            var reader = new StreamReader(memory);
+//            return Json(await reader.ReadToEndAsync());
+//        }
 
         // POST api/values
         [HttpPost]
-        public async void Post(string documentId, IEnumerable<IFormFile> files)
+        public async Task<IActionResult> PostAsync([FromForm] string documentId, [FromForm] IEnumerable<IFormFile> files)
         {
-            var path = Path.GetTempFileName();
-
-            foreach(var file in files)
+            var list = files.ToList();
+            if (!list.Any())
+            {
+                return BadRequest("Empty file list");
+            }
+            foreach(var file in list)
             {
                 var memory = new MemoryStream();
                 await file.CopyToAsync(memory);
-                await DocumentDbRepository<StoredItem>.AddAttachment(documentId, memory);
+                memory.Seek(0, SeekOrigin.Begin);
+//                await DocumentDbRepository<StoredItem>.AddAttachment(documentId, memory);
+                await storedItemService.AddAttachmentAsync(documentId, memory);
             }
+            return Ok();
         }
 
         // PUT api/values/5
