@@ -8,20 +8,27 @@ using System.IO;
 using Documentz.Repositories;
 using Documentz.Models;
 using Documentz.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Documentz.Controllers
 {
-    [Route("api/[controller]")]
+    //[Route("api/documents/{documentId?}/attachments")]
+    [Route("api/attachments")]
+    [Authorize]
     public class AttachmentsController : Controller
     {
         private readonly IStoredItemService storedItemService;
         public AttachmentsController(IStoredItemService service) => storedItemService = service;
 
-        // GET: api/values
+        /// <summary>
+        /// Returns all attachments for selected document
+        /// </summary>
+        /// <param name="documentId">Document Id</param>
+        /// <returns></returns>
         [HttpGet]
-        public async Task<IEnumerable<dynamic>> GetAsync(string id)
+        public async Task<IEnumerable<dynamic>> GetAsync(string documentId)
         {
-            return await storedItemService.GetAttachmentsAsync(id);
+            return await storedItemService.GetAttachmentsAsync(documentId);
         }
 
         // GET api/values/5
@@ -35,7 +42,6 @@ namespace Documentz.Controllers
 //            return Json(await reader.ReadToEndAsync());
 //        }
 
-        // POST api/values
         [HttpPost]
         public async Task<IActionResult> PostAsync([FromForm] string documentId, [FromForm] IEnumerable<IFormFile> files)
         {
@@ -49,7 +55,6 @@ namespace Documentz.Controllers
                 var memory = new MemoryStream();
                 await file.CopyToAsync(memory);
                 memory.Seek(0, SeekOrigin.Begin);
-//                await DocumentDbRepository<StoredItem>.AddAttachment(documentId, memory);
                 await storedItemService.AddAttachmentAsync(documentId, memory);
             }
             return Ok();

@@ -15,7 +15,10 @@ using Documentz.Models;
 using Documentz.Services;
 using Documentz.Utils;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Authentication;
+using AutoMapper;
 
 namespace Documentz
 {
@@ -47,10 +50,17 @@ namespace Documentz
                 c.SwaggerDoc("v1", new Info { Title = "Documentz API", Version = "v1" });
             });
 
+            services.AddAuthentication(sharedOptions =>
+            {
+                sharedOptions.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddAzureAdB2CBearer(options => Configuration.Bind("AzureAdB2C", options));
+
             services.Configure<CosmosConfig>(Configuration.GetSection("CosmosConfig"));
             services.Configure<FormOptions>(opt => opt.MemoryBufferThreshold = Int32.MaxValue);
             services.AddSingleton<IDbService, CosmosDbService>();
             services.AddSingleton<IStoredItemService, StoredItemService>();
+
             AutoMappingConfigurator.Configure();
         }
 
@@ -68,6 +78,8 @@ namespace Documentz
             app.UseMvc();
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
+
+            app.UseAuthentication();
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS etc.), specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>

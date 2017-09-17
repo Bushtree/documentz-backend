@@ -19,5 +19,9 @@ namespace Documentz.Models
 
         [JsonProperty(PropertyName = "tags")]
         public IList<string> Tags { get; set; }
+
+        public DateTime CreationTime { get; set; } = DateTime.Now;
+
+        public DateTime LastModified { get; set; } = DateTime.Now;
     }
 }

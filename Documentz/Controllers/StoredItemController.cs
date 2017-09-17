@@ -4,11 +4,13 @@ using Documentz.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Documentz.Models;
 using Documentz.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Documentz.Controllers
 {
     [Produces("application/json")]
-    [Route("api/[controller]")]
+    [Route("api/documents")]
+    [Authorize]
     public class StoredItemController : Controller
     {
         private IStoredItemService StoredItemService { get; }

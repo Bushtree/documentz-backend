@@ -67,12 +67,11 @@ namespace Documentz.Repositories
             return await client.CreateAttachmentAsync(document.AttachmentsLink, file);
         }
 
-        public static async Task<Stream> GetAttachment(string id)
+        public static async Task<Stream> GetAttachment(string attachmentLink)
         {
-            Document document = await client.ReadDocumentAsync(UriFactory.CreateDocumentUri(DatabaseId, CollectionId, id));
-            var attachments = await client.ReadAttachmentFeedAsync(document.AttachmentsLink);
+            var attachment = (Attachment) (await client.ReadAttachmentAsync(attachmentLink));
+            var media = await client.ReadMediaAsync(attachment.MediaLink);
 
-            var media = await client.ReadMediaAsync(attachments.First()?.MediaLink);
             return media.Media;
         }
 

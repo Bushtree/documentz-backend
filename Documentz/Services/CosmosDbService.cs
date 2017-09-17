@@ -190,8 +190,4 @@ namespace Documentz.Services
 
         #endregion
     }
-
-    public interface IAttachment
-    {
-    }
 }

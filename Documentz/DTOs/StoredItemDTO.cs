@@ -12,5 +12,9 @@ namespace Documentz.DTOs
         public string Name { get; set; }
         public string Description { get; set; }
         public IList<string> Tags { get; set; }
+
+        public DateTime CreationTime => throw new NotImplementedException();
+
+        public DateTime LastModified => throw new NotImplementedException();
     }
 }

@@ -5,15 +5,11 @@ using System.Threading.Tasks;
 
 namespace Documentz.Models
 {
-    public interface IStoredItem
+    public interface IUser
     {
         string Id { get; }
         string Name { get; }
-
-        string Description { get; }
-
-        IList<string> Tags { get; }
-        DateTime CreationTime { get; }
-        DateTime LastModified { get; }
+        string Email { get; }
+        DateTime CreatedTime { get; }
     }
 }
